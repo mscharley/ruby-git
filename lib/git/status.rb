@@ -50,7 +50,7 @@ module Git
     end
     
     class StatusFile
-      attr_accessor :path, :type, :stage, :untracked
+      attr_accessor :path, :type, :type_raw, :stage, :untracked
       attr_accessor :mode_index, :mode_repo
       attr_accessor :sha_index, :sha_repo
 
@@ -58,6 +58,7 @@ module Git
         @base = base
         @path = hash[:path]
         @type = hash[:type]
+        @type_raw = hash[:type_raw]
         @stage = hash[:stage]
         @mode_index = hash[:mode_index]
         @mode_repo = hash[:mode_repo]
@@ -80,28 +81,25 @@ module Git
     private
     
       def construct_status
-        @files = @base.lib.ls_files
-        ignore = @base.lib.ignored_files
-        
-        # find untracked in working dir
-        Dir.chdir(@base.dir.path) do
-          Dir.glob('**/*') do |file|
-            @files[file] = {:path => file, :untracked => true} unless @files[file] || File.directory?(file) || ignore.include?(file)
+        files = @base.lib.status.find_all {|l| not l.nil?}
+        @files = {}
+
+        files.each do |file_hash|
+          status = file_hash[0, 2]
+          file_hash = {:path => file_hash[3, file_hash.length - 3], :type_raw => status}
+          
+          case status
+          when '??'
+            file_hash[:untracked] = true
+          when 'M ', 'A '
+            file_hash[:type] = 'A'
+          when ' M', ' D'
+            file_hash[:type] = 'M'
+          when 'D '
+            file_hash[:type] = 'D'
           end
-        end
-        
-        # find modified in tree
-        @base.lib.diff_files.each do |path, data|
-          @files[path] ? @files[path].merge!(data) : @files[path] = data
-        end
-        
-        # find added but not committed - new files
-        @base.lib.diff_index('HEAD').each do |path, data|
-          @files[path] ? @files[path].merge!(data) : @files[path] = data
-        end
-        
-        @files.each do |k, file_hash|
-          @files[k] = StatusFile.new(@base, file_hash)
+          
+          @files[file_hash[:path]] = StatusFile.new(@base, file_hash)
         end
       end
       

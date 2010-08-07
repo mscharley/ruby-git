@@ -391,6 +391,10 @@ module Git
     def global_config_set(name, value)
       command('config', ['--global', name, value], false)
     end
+    
+    def status
+      command_lines('status', ['--porcelain'])
+    end
           
     def add(path = '.')
       arr_opts = ['--']
