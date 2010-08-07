@@ -93,7 +93,7 @@ module Git
             file_hash[:untracked] = true
           when 'M ', 'A '
             file_hash[:type] = 'A'
-          when ' M', 'MM', ' D'
+          when ' M', 'MM', 'AM', ' D', 'MD'
             file_hash[:type] = 'M'
           when 'D '
             file_hash[:type] = 'D'
