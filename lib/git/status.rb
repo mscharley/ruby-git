@@ -24,6 +24,10 @@ module Git
       @files.select { |k, f| f.untracked }
     end
     
+    def all_changes
+      @files
+    end
+    
     def pretty
       out = ''
       self.each do |file|
@@ -82,7 +86,7 @@ module Git
     
       def construct_status
         files = @base.lib.status.find_all {|l| not l.nil?}
-        @files = {}
+        @files = []
 
         files.each do |file_hash|
           status = file_hash[0, 2]
@@ -99,7 +103,7 @@ module Git
             file_hash[:type] = 'D'
           end
           
-          @files[file_hash[:path]] = StatusFile.new(@base, file_hash)
+          @files.push([file_hash[:path], StatusFile.new(@base, file_hash)])
         end
       end
       
