@@ -431,6 +431,7 @@ module Git
       arr_opts = []
       arr_opts << '--hard' if opts[:hard]
       arr_opts << commit if commit
+      arr_opts << '-q' << '--' << opts[:file] if opts[:file]
       command('reset', arr_opts)
     end
     
