@@ -395,6 +395,10 @@ module Git
     def status
       command_lines('status', ['--porcelain'])
     end
+    
+    def full_status
+      command('status')
+    end
           
     def add(path = '.')
       arr_opts = ['--']
@@ -682,10 +686,11 @@ module Git
       ENV['GIT_INDEX_FILE'] = @git_index_file
       ENV['GIT_WORK_TREE'] = @git_work_dir
       path = @git_work_dir || @git_dir || @path
-
+      
       opts = [opts].flatten.map {|s| escape(s) }.join(' ')
       git_cmd = "git #{cmd} #{opts} #{redirect} 2>&1"
-
+      #p git_cmd
+      
       out = nil
       if chdir && (Dir.getwd != path)
         Dir.chdir(path) { out = run_command(git_cmd, &block) } 
