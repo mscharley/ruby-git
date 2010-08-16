@@ -722,7 +722,7 @@ module Git
     end
 
     def escape(s)
-      escaped = s.to_s.gsub(%q{'}, %q{\\\'})
+      escaped = s.to_s.gsub(%q{'}, %q{'"'"'})
       %Q{'#{escaped}'}
     end
 
