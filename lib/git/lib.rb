@@ -690,7 +690,7 @@ module Git
       
       opts = [opts].flatten.map {|s| escape(s) }.join(' ')
       git_cmd = "git #{cmd} #{opts} #{redirect} 2>&1"
-      #p git_cmd
+      p git_cmd
       
       out = nil
       if chdir && (Dir.getwd != path)
