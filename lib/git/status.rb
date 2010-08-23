@@ -90,7 +90,22 @@ module Git
 
         files.each do |file_hash|
           status = file_hash[0, 2]
-          file_hash = {:path => file_hash[3, file_hash.length - 3], :type_raw => status}
+          path = file_hash[3, file_hash.length - 3]
+          # If git quotes the filename, we need to expand it
+          if status[0,1] == "R" or status[0,1] == "C"
+            path = path.split(' -> ').map do |p|
+              if p[0,1] == '"' and p[p.length-1,1] == '"'
+                eval(p)
+              else
+                path
+              end
+            end.join(' -> ')
+          else
+            if path[0,1] == '"' and path[path.length-1,1] == '"'
+              path = eval(path)
+            end
+          end
+          file_hash = {:path => path, :type_raw => status}
           
           case status
           when '??'
