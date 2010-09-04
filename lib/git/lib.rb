@@ -662,7 +662,7 @@ module Git
     end
 
     def required_command_version
-      [1, 6, 0, 0]
+      [1, 7, 0, 0]
     end
 
     def meets_required_version?
